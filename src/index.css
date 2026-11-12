@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Palette: Light Mode (Well-kept physical notebook) */
+    --paper-bg: #FAF7F0;
+    --paper-card: #FFFFFF;
+    --paper-elevated: #F5EFE6;
+    --paper-rule: #E8DFD1;
+    --paper-border: #DECFC0;
+    --paper-margin-line: #E87A7A;
+
+    /* Deep ink blue text */
+    --ink-primary: #14213D;
+    --ink-secondary: #364968;
+    --ink-muted: #5E718D;
+    --ink-faint: #94A3B8;
+
+    /* Turmeric / Marigold single accent hue */
+    --marigold-accent: #C86D00;
+    --marigold-hover: #AB5A00;
+    --marigold-light: #FFF7ED;
+    --marigold-border: #FDBA74;
+
+    /* Brick red strictly for corrections / alerts */
+    --brick-red: #9E2A2B;
+    --brick-red-light: #FEF2F2;
+    --brick-red-border: #FCA5A5;
+
+    /* Shadows: subtle paper lift, zero heavy glowing drop-shadows */
+    --paper-shadow-sm: 0 1px 2px 0 rgba(20, 33, 61, 0.05);
+    --paper-shadow: 0 2px 4px -1px rgba(20, 33, 61, 0.06), 0 1px 2px -1px rgba(20, 33, 61, 0.04);
+    --paper-shadow-lift: 0 4px 6px -1px rgba(20, 33, 61, 0.08), 0 2px 4px -1px rgba(20, 33, 61, 0.06);
+  }
+
+  .dark {
+    /* Palette: Dark Mode (Warm charcoal notebook, never neon) */
+    --paper-bg: #151719;
+    --paper-card: #1D2126;
+    --paper-elevated: #262B32;
+    --paper-rule: #2D343E;
+    --paper-border: #3A4350;
+    --paper-margin-line: #7A3D3D;
+
+    /* Warm parchment ink text */
+    --ink-primary: #F1EFEA;
+    --ink-secondary: #D4CEBF;
+    --ink-muted: #969389;
+    --ink-faint: #5C5950;
+
+    /* Warm golden marigold in dark mode */
+    --marigold-accent: #E59500;
+    --marigold-hover: #FBBF24;
+    --marigold-light: #2A2111;
+    --marigold-border: #784E07;
+
+    /* Brick red in dark mode */
+    --brick-red: #D9534F;
+    --brick-red-light: #2B1516;
+    --brick-red-border: #802728;
+
+    --paper-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+    --paper-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.35);
+    --paper-shadow-lift: 0 4px 6px -1px rgba(0, 0, 0, 0.45);
+  }
+
+  body {
+    background-color: var(--paper-bg);
+    color: var(--ink-primary);
+    font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, .font-serif-title {
+    font-family: 'Eczar', 'Noto Serif Devanagari', Georgia, serif;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  .font-mono-time {
+    font-family: 'JetBrains Mono', Courier, monospace;
+    font-feature-settings: "tnum" 1;
+  }
+}
+
+/* Notebook paper texture utility & subtle margin border */
+.notebook-ruled {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    var(--paper-rule) 31px,
+    var(--paper-rule) 32px
+  );
+  line-height: 32px;
+}
+
+.notebook-margin-left {
+  position: relative;
+}
+
+.notebook-margin-left::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 2rem;
+  width: 1.5px;
+  background-color: var(--paper-margin-line);
+  opacity: 0.65;
+  pointer-events: none;
+}

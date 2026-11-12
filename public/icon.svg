@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#FAF7F0" />
+  <!-- Notebook edge rule -->
+  <line x1="110" y1="40" x2="110" y2="472" stroke="#9E2A2B" stroke-width="6" stroke-dasharray="12,12" opacity="0.6"/>
+  <!-- Notebook lines -->
+  <line x1="130" y1="130" x2="450" y2="130" stroke="#E2DAC9" stroke-width="4"/>
+  <line x1="130" y1="190" x2="450" y2="190" stroke="#E2DAC9" stroke-width="4"/>
+  <line x1="130" y1="250" x2="450" y2="250" stroke="#E2DAC9" stroke-width="4"/>
+  <line x1="130" y1="310" x2="450" y2="310" stroke="#E2DAC9" stroke-width="4"/>
+  <line x1="130" y1="370" x2="450" y2="370" stroke="#E2DAC9" stroke-width="4"/>
+  <!-- Ink Quill & Book emblem -->
+  <path d="M 180 340 L 256 220 L 332 340 Z" fill="#14213D"/>
+  <path d="M 256 160 Q 280 180 340 180 Q 290 230 256 310 Q 222 230 172 180 Q 232 180 256 160 Z" fill="#C86D00"/>
+  <!-- Devanagari character 'प' / 'पढ़' ligature -->
+  <text x="256" y="380" font-family="'Noto Sans Devanagari', 'Eczar', serif" font-weight="bold" font-size="72" fill="#14213D" text-anchor="middle">पढ़AI</text>
+</svg>
