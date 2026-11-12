@@ -56,7 +56,7 @@
 ### Prerequisites
 - Node.js 18+ (tested on Node 20 / 22)
 - Python 3.10+
-
+### https://padhai-1.ai.studio
 ### Frontend (Port 3000)
 ```bash
 # Install dependencies
