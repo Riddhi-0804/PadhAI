@@ -1,6 +1,7 @@
 import React from 'react';
 import { LayoutDashboard, BookMarked, Sparkles, Clock, CheckCircle } from 'lucide-react';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { EmptyState } from '../ui/EmptyState';
 import { Tag } from '../ui/Tag';
 import { Card } from '../ui/Card';
@@ -16,6 +17,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onTriggerToast,
 }) => {
   const { t, language } = useLanguage();
+  const { user } = useAuth();
+  const displayName =
+    user?.name?.trim() || user?.email?.split('@')[0] || (language === 'hi' ? 'विद्यार्थी' : 'Learner');
 
   return (
     <div className="w-full text-left space-y-6">
@@ -24,12 +28,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-mono-time text-[var(--marigold-accent)] font-semibold">
-              DESK // ARJUN VERMA
+              DESK // {displayName.toUpperCase()}
             </span>
             <Tag variant="neutral" size="sm">CBSE 2025</Tag>
           </div>
           <h2 className="font-serif-title text-2xl font-bold text-[var(--ink-primary)]">
-            {language === 'hi' ? 'नमस्ते अर्जुन, आज का अध्ययन सत्र' : 'Welcome Arjun, Today’s Study Session'}
+            {language === 'hi' ? `नमस्ते, ${displayName}` : `Hello, ${displayName}`}
           </h2>
           <p className="text-xs text-[var(--ink-muted)] mt-0.5">
             Target: Physics (Ray Optics) & Chemistry (Coordination Compounds)

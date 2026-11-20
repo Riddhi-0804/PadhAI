@@ -31,12 +31,7 @@ def get_current_user_obj(authorization: Optional[str] = Header(None)) -> Dict[st
                 "name": payload.get("name"),
                 "role": payload.get("role")
             }
-    return {
-        "id": "usr_student_01",
-        "email": "arjun.sharma@student.padhai.in",
-        "name": "Arjun Sharma",
-        "role": "student"
-    }
+    raise HTTPException(status_code=401, detail="Missing or invalid Authorization token")
 
 @router.post("/ask")
 async def ask_doubt(

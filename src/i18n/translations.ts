@@ -55,23 +55,71 @@ export interface TranslationSchema {
     adminDesk: string;
   };
   landing: {
-    badge: string;
-    heroTitle: string;
-    heroDescription: string;
-    heroCtaPrimary: string;
-    heroCtaSecondary: string;
-    featurePauseTitle: string;
-    featurePauseSubtitle: string;
-    featurePauseText1: string;
-    featurePauseText2: string;
-    quoteSenior: string;
-    subjectsHeading: string;
-    subjectPhysics: string;
-    subjectAccounts: string;
-    subjectEconomics: string;
-    subjectChemistry: string;
-    notebookConceptHeading: string;
-    notebookConceptDesc: string;
+    pageWord: string;
+    heroTitleA: string;
+    heroTitleMark: string;
+    heroTitleB: string;
+    heroSubline: string;
+    heroPrimary: string;
+    heroSecondary: string;
+    heroNote: string;
+    freeToStart: string;
+    feelingHeading: string;
+    feeling1: string;
+    feeling2: string;
+    feeling3: string;
+    feeling4: string;
+    feelingMarginNote: string;
+    howHeading: string;
+    step1Title: string;
+    step1Text: string;
+    step2Title: string;
+    step2Text: string;
+    step3Title: string;
+    step3Text: string;
+    pauseHeading: string;
+    pauseNote: string;
+    pauseBadge: string;
+    pauseMarginNote: string;
+    pauseButton: string;
+    pauseReveal: string;
+    languageHeading: string;
+    languageLine: string;
+    slipHindiLabel: string;
+    slipHindiText: string;
+    slipTamilLabel: string;
+    slipTamilText: string;
+    slipBengaliLabel: string;
+    slipBengaliText: string;
+    slipEnglishLabel: string;
+    slipEnglishText: string;
+    examWord: string;
+    examWordLabel: string;
+    promisesHeading: string;
+    promiseMadeTitle: string;
+    promiseMadeText: string;
+    promiseYoursTitle: string;
+    promiseYoursText: string;
+    promiseSlowTitle: string;
+    promiseSlowText: string;
+    promiseTalkTitle: string;
+    promiseTalkText: string;
+    promisePracticeTitle: string;
+    promisePracticeText: string;
+    promiseTeacherTitle: string;
+    promiseTeacherText: string;
+    studentNoteLabel: string;
+    studentNoteQuote: string;
+    studentNoteSign: string;
+    studentNoteDisclaimer: string;
+    closingTitle: string;
+    closingButton: string;
+    footerNote: string;
+    footerSignature: string;
+    footerFeeling: string;
+    footerHow: string;
+    footerPromises: string;
+    footerTop: string;
   };
   emptyStates: {
     dashboard: { title: string; description: string; action: string };
@@ -121,7 +169,7 @@ export const translations: Record<'en' | 'hi', TranslationSchema> = {
       loginSuccess: 'Signed in successfully to notebook',
       logoutSuccess: 'Signed out from session',
       registeredSuccess: 'Account created! Complete your syllabus onboarding.',
-      invalidCreds: 'Invalid credentials. Try using one of the seed accounts.',
+      invalidCreds: 'Incorrect email or password. Please try again.',
       onboardingTitle: 'Student Syllabus Onboarding',
       onboardingSubtitle: 'Help us calibrate your desk so all doubt annotations cite the right chapters.',
       step1Language: 'Primary Study Language',
@@ -152,23 +200,71 @@ export const translations: Record<'en' | 'hi', TranslationSchema> = {
       adminDesk: 'System Admin',
     },
     landing: {
-      badge: 'CBSE, State Boards & Competitive Prep',
-      heroTitle: 'Study from your own notes. In the language you actually think in.',
-      heroDescription: 'Upload class notes, pause tricky lecture videos to ask instant doubts, and practice real exam questions. Without fake AI jargon, without jumping ahead in the lecture.',
-      heroCtaPrimary: 'Open Study Desk',
-      heroCtaSecondary: 'How "Pause & Ask" Works',
-      featurePauseTitle: 'Why Pause & Ask is Different',
-      featurePauseSubtitle: 'The teacher in the video hasn’t explained the formula yet? We won’t spoil it.',
-      featurePauseText1: 'Standard chatbots search the entire web and summarize the end of the video, confusing you with formulas you haven’t reached yet.',
-      featurePauseText2: 'PadhAI respects your exact timestamp. When you pause at 14:20 of Ray Optics, it explains only what Sir has taught up to 14:20, using your own notebook definitions.',
-      quoteSenior: '"A senior bhaiya who sits next to you with a pencil, marks where you got stuck, and explains in simple Hindi."',
-      subjectsHeading: 'Built for actual subjects tested across India',
-      subjectPhysics: 'Physics (Class 12 & JEE)',
-      subjectAccounts: 'Accountancy (Partnership & Cash Flow)',
-      subjectEconomics: 'Economics (Macroeconomics & Indian Dev)',
-      subjectChemistry: 'Chemistry (Organic Reactions & NCERT)',
-      notebookConceptHeading: 'The Notebook Rule',
-      notebookConceptDesc: 'No futuristic neon gradients or AI bubbles. Your study desk looks like clean ruled paper with ink notes, a marigold bookmark, and red ink only when correcting a calculation.',
+      pageWord: 'page',
+      heroTitleA: 'Padhai ab ',
+      heroTitleMark: 'samajh',
+      heroTitleB: ' mein aayegi.',
+      heroSubline: 'Ruko, poocho, aur khud samjho. Apni bhasha mein.',
+      heroPrimary: 'Start with one page',
+      heroSecondary: 'See how it feels',
+      heroNote: 'Ye samajh nahi aaya? Koi baat nahi.',
+      freeToStart: 'Free to start. No tension.',
+      feelingHeading: 'We know this feeling',
+      feeling1: "Sir ne kaha, 'sab clear hai?' Aur tumne haan bol diya.",
+      feeling2: 'Raat ke 11 baje doubt aaya, aur poochne wala koi nahi.',
+      feeling3: 'Book English mein hai, samajh Hindi mein aata hai.',
+      feeling4: 'Answer mil gaya, par yaad kuch nahi raha.',
+      feelingMarginNote: 'You are not slow. You just need a better way.',
+      howHeading: 'How PadhAI sits next to you',
+      step1Title: 'Bring your own notes',
+      step1Text: 'Photo of your copy, a PDF, anything you study from.',
+      step2Title: 'Pause and ask',
+      step2Text: 'Stuck in a lecture? Pause and ask, just like you would ask a friend.',
+      step3Title: 'Understand it yourself',
+      step3Text: 'We guide you to the answer instead of handing it over, so it actually stays.',
+      pauseHeading: 'We will not spoil the story.',
+      pauseNote: 'Hmm, good question. Your teacher explains this a little later. Here is a small hint till then…',
+      pauseBadge: 'Paused',
+      pauseMarginNote: 'right where you stopped',
+      pauseButton: 'Show me anyway',
+      pauseReveal: 'For now, look at the diagram once and say out loud what you already know. That is usually enough to keep going.',
+      languageHeading: 'Your language, your way',
+      languageLine: "Understand in your language. Write it in the exam's language.",
+      slipHindiLabel: 'Hindi',
+      slipHindiText: 'बल से चीज़ें चलती हैं।',
+      slipTamilLabel: 'Tamil',
+      slipTamilText: 'விசையால் பொருள்கள் நகரும்.',
+      slipBengaliLabel: 'Bengali',
+      slipBengaliText: 'বল প্রয়োগে জিনিস নড়ে।',
+      slipEnglishLabel: 'English',
+      slipEnglishText: 'Force makes things move.',
+      examWord: 'Force',
+      examWordLabel: 'in the exam',
+      promisesHeading: 'Small promises',
+      promiseMadeTitle: 'Made from your own notes',
+      promiseMadeText: 'Not from some random corner of the internet.',
+      promiseYoursTitle: 'Your notes stay yours',
+      promiseYoursText: 'We never pass them on to anyone else.',
+      promiseSlowTitle: 'Works on slow internet',
+      promiseSlowText: 'One bar is enough. Really.',
+      promiseTalkTitle: 'Talk instead of typing',
+      promiseTalkText: 'When your hands are tired, just speak.',
+      promisePracticeTitle: 'Practice that fits you',
+      promisePracticeText: 'Not the whole syllabus in one night.',
+      promiseTeacherTitle: 'Your teacher sees where you got stuck',
+      promiseTeacherText: 'So nobody has to guess.',
+      studentNoteLabel: "A student's note",
+      studentNoteQuote: 'Pehli baar laga ki padhai mujhse dosti kar rahi hai.',
+      studentNoteSign: '— a student like you',
+      studentNoteDisclaimer: 'An example line, not a real student and not a customer review.',
+      closingTitle: 'Aaj bas ek page se shuru karo.',
+      closingButton: 'Open my notebook',
+      footerNote: 'No card needed. Just your copy.',
+      footerSignature: 'PadhAI · for the 11 pm doubt',
+      footerFeeling: 'The feeling',
+      footerHow: 'How it sits with you',
+      footerPromises: 'Small promises',
+      footerTop: 'Back to the top',
     },
     emptyStates: {
       dashboard: {
@@ -244,7 +340,7 @@ export const translations: Record<'en' | 'hi', TranslationSchema> = {
       loginSuccess: 'सफलतापूर्वक नोटबुक में लॉगिन हुआ',
       logoutSuccess: 'सत्र समाप्त हुआ',
       registeredSuccess: 'खाता बन गया! अपना सिलेबस ऑनबोर्डिंग पूरा करें।',
-      invalidCreds: 'गलत ईमेल या पासवर्ड। कृपया सीड खातों में से चुनें।',
+      invalidCreds: 'गलत ईमेल या पासवर्ड। कृपया दोबारा प्रयास करें।',
       onboardingTitle: 'छात्र सिलेबस ऑनबोर्डिंग',
       onboardingSubtitle: 'अपनी डेस्क सेट करें ताकि शंकाओं के समाधान सटीक अध्यायों से मिलें।',
       step1Language: 'अध्ययन की मुख्य भाषा',
@@ -275,23 +371,71 @@ export const translations: Record<'en' | 'hi', TranslationSchema> = {
       adminDesk: 'सिस्टम एडमिन',
     },
     landing: {
-      badge: 'सीबीएसई, स्टेट बोर्ड और प्रतियोगी परीक्षाओं की तैयारी',
-      heroTitle: 'अपने नोट्स से पढ़ें। उस भाषा में जिसमें आप सच में सोचते हैं।',
-      heroDescription: 'क्लास के नोट्स अपलोड करें, कठिन लेक्चर वीडियो रोककर तुरंत सवाल पूछें, और बिना किसी दिखावे या आगे का सस्पेंस बिगाड़े सीधे परीक्षा-उन्मुख अभ्यास करें।',
-      heroCtaPrimary: 'स्टडी डेस्क खोलें',
-      heroCtaSecondary: '"पॉज़ और पूछें" कैसे काम करता है?',
-      featurePauseTitle: 'पॉज़ और पूछें (Pause & Ask) अलग क्यों है?',
-      featurePauseSubtitle: 'अगर शिक्षक ने वीडियो में आगे का फ़ॉर्मूला अभी नहीं पढ़ाया, तो हम भी आगे का स्पॉइलर नहीं देंगे।',
-      featurePauseText1: 'आम चैटबॉट्स पूरा इंटरनेट खंगाल कर वीडियो के अंत का सारांश दे देते हैं, जिससे आप ऐसे फ़ॉर्मूले देखकर उलझ जाते हैं जो आपने अभी तक पढ़े ही नहीं।',
-      featurePauseText2: 'पढ़AI आपके सटीक समय (टाइमस्टैम्प) का ध्यान रखता है। अगर आपने रे-ऑप्टिक्स में 14:20 पर वीडियो रोका, तो वह केवल 14:20 तक पढ़ाए गए हिस्से से ही आपकी अपनी नोटबुक के अनुसार समझाएगा।',
-      quoteSenior: '"एक सीनियर भैया की तरह, जो पास बैठकर पेंसिल से मार्क करता है और सरल हिंदी में समझाता है।"',
-      subjectsHeading: 'भारत के प्रमुख बोर्ड विषयों के लिए तैयार',
-      subjectPhysics: 'भौतिक विज्ञान (12वीं और जेईई)',
-      subjectAccounts: 'लेखाशास्त्र (पार्टनरशिप व कैश फ्लो)',
-      subjectEconomics: 'अर्थशास्त्र (मैक्रोइकॉनॉमिक्स व भारतीय विकास)',
-      subjectChemistry: 'रसायन विज्ञान (ऑर्गेनिक व एनसीईआरटी)',
-      notebookConceptHeading: 'साफ़ नोटबुक का नियम',
-      notebookConceptDesc: 'कोई चमक-दमक या कृत्रिम नीले-बैंगनी ग्रेडिएंट नहीं। आपकी डेस्क साफ़ कागज़, नीली स्याही, गेंदे के रंग का मार्कर, और लाल स्याही केवल ग़लती सुधारने के लिए प्रयोग करती है।',
+      pageWord: 'पन्ना',
+      heroTitleA: 'पढ़ाई अब ',
+      heroTitleMark: 'समझ',
+      heroTitleB: ' में आएगी।',
+      heroSubline: 'रुकिए, पूछिए, और खुद समझिए। अपनी भाषा में।',
+      heroPrimary: 'एक पन्ने से शुरू करें',
+      heroSecondary: 'देखिए, कैसा लगता है',
+      heroNote: 'ये समझ नहीं आया? कोई बात नहीं।',
+      freeToStart: 'शुरू करना मुफ़्त है। कोई टेंशन नहीं।',
+      feelingHeading: 'यह एहसास हम जानते हैं',
+      feeling1: "सर ने पूछा, 'सब समझ आया?' और तुमने हाँ बोल दिया।",
+      feeling2: 'रात के 11 बजे doubt आया, और पूछने वाला कोई नहीं।',
+      feeling3: 'किताब अंग्रेज़ी में है, समझ हिंदी में आता है।',
+      feeling4: 'जवाब मिल गया, पर याद कुछ नहीं रहा।',
+      feelingMarginNote: 'आप कमज़ोर नहीं हैं। बस तरीका बदलना है।',
+      howHeading: 'पढ़AI आपके बगल में कैसे बैठता है',
+      step1Title: 'अपने ही नोट्स लाइए',
+      step1Text: 'अपनी कॉपी की फ़ोटो या PDF, जो भी आप पढ़ते हैं।',
+      step2Title: 'रुकिए और पूछिए',
+      step2Text: 'लेक्चर में अटक गए? रुकिए और पूछिए, जैसे दोस्त से पूछते हैं।',
+      step3Title: 'खुद समझिए',
+      step3Text: 'हम जवाब थमाते नहीं, रास्ता दिखाते हैं, ताकि बात सच में याद रहे।',
+      pauseHeading: 'कहानी का मज़ा खराब नहीं करेंगे।',
+      pauseNote: 'अच्छा सवाल! टीचर आगे इसे समझाएँगे। तब तक एक छोटा सा hint।',
+      pauseBadge: 'रुका हुआ',
+      pauseMarginNote: 'जहाँ आपने रोका, वहीं से',
+      pauseButton: 'फिर भी दिखाओ',
+      pauseReveal: 'अभी के लिए आकृति को एक बार देखिए और जो पहले से पता है, वह बोलकर कहिए। बस इतना ही काफ़ी होता है।',
+      languageHeading: 'आपकी भाषा, आपका तरीका',
+      languageLine: 'अपनी भाषा में समझिए। परीक्षा की भाषा में लिखिए।',
+      slipHindiLabel: 'हिंदी',
+      slipHindiText: 'बल से चीज़ें चलती हैं।',
+      slipTamilLabel: 'तमिल',
+      slipTamilText: 'விசையால் பொருள்கள் நகரும்.',
+      slipBengaliLabel: 'बांग्ला',
+      slipBengaliText: 'বল প্রয়োগে জিনিস নড়ে।',
+      slipEnglishLabel: 'अंग्रेज़ी',
+      slipEnglishText: 'Force makes things move.',
+      examWord: 'Force',
+      examWordLabel: 'परीक्षा में',
+      promisesHeading: 'छोटे-छोटे वादे',
+      promiseMadeTitle: 'आपके अपने नोट्स से बना',
+      promiseMadeText: 'इंटरनेट के किसी कोने से नहीं।',
+      promiseYoursTitle: 'आपके नोट्स आपके ही रहते हैं',
+      promiseYoursText: 'हम उन्हें किसी और को नहीं देते।',
+      promiseSlowTitle: 'धीमे इंटरनेट पर भी चलता है',
+      promiseSlowText: 'एक बार भी बहुत है।',
+      promiseTalkTitle: 'टाइप करने की जगह बोलिए',
+      promiseTalkText: 'हाथ थक जाएँ तो बस बोल दीजिए।',
+      promisePracticeTitle: 'आपके हिसाब से अभ्यास',
+      promisePracticeText: 'एक रात में पूरा सिलेबस नहीं।',
+      promiseTeacherTitle: 'टीचर को दिखता है कि आप कहाँ अटके',
+      promiseTeacherText: 'ताकि किसी को अंदाज़ा न लगाना पड़े।',
+      studentNoteLabel: 'एक विद्यार्थी का नोट',
+      studentNoteQuote: 'पहली बार लगा कि पढ़ाई मुझसे दोस्ती कर रही है।',
+      studentNoteSign: '— आप जैसा एक विद्यार्थी',
+      studentNoteDisclaimer: 'यह सिर्फ़ एक उदाहरण पंक्ति है, किसी असली विद्यार्थी या ग्राहक की समीक्षा नहीं।',
+      closingTitle: 'आज बस एक पन्ने से शुरू कीजिए।',
+      closingButton: 'मेरी कॉपी खोलें',
+      footerNote: 'कार्ड की ज़रूरत नहीं। बस आपकी कॉपी।',
+      footerSignature: 'पढ़AI · रात 11 बजे वाली शंका के लिए',
+      footerFeeling: 'यह एहसास',
+      footerHow: 'हम कैसे पास बैठते हैं',
+      footerPromises: 'छोटे वादे',
+      footerTop: 'ऊपर वापस',
     },
     emptyStates: {
       dashboard: {

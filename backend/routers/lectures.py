@@ -48,7 +48,7 @@ def get_auth_user_id(authorization: Optional[str] = Header(None)) -> str:
         payload = decode_jwt_token(token)
         if payload and "sub" in payload:
             return payload["sub"]
-    return "usr_student_01"
+    raise HTTPException(status_code=401, detail="Missing or invalid Authorization token")
 
 @router.post("/add")
 async def add_video(

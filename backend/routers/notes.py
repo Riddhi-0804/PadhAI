@@ -23,13 +23,13 @@ class TypedNoteUpload(BaseModel):
     content: str
 
 def get_auth_user_id(authorization: Optional[str] = Header(None)) -> str:
-    """Extract user_id from Bearer token, fallback to student Arjun Sharma."""
+    """Extract user_id from the Bearer token; reject missing or invalid tokens."""
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ")[1]
         payload = decode_jwt_token(token)
         if payload and "sub" in payload:
             return payload["sub"]
-    return "usr_student_01"
+    raise HTTPException(status_code=401, detail="Missing or invalid Authorization token")
 
 def split_content_into_page_chunks(raw_text: str) -> List[Dict[str, Any]]:
     """

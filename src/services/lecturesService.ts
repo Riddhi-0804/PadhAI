@@ -1,4 +1,5 @@
 import { VideoLecture, TranscriptChunk, PauseDoubtResult, LectureFlashcard } from '../types/lectures';
+import { apiFetch } from './api';
 
 const SEED_VIDEO: VideoLecture = {
   id: 'vid_physics_rayoptics_01',
@@ -69,7 +70,7 @@ class LecturesService {
 
   async getVideo(id: string = 'vid_physics_rayoptics_01'): Promise<{ video: VideoLecture; transcript: TranscriptChunk[] }> {
     try {
-      const res = await fetch(`/api/lectures/${id}`);
+      const res = await apiFetch(`/api/lectures/${id}`);
       if (res.ok) {
         const data = await res.json();
         return {
@@ -90,7 +91,7 @@ class LecturesService {
     language?: string;
   }): Promise<PauseDoubtResult> {
     try {
-      const res = await fetch('/api/lectures/pause-doubt', {
+      const res = await apiFetch('/api/lectures/pause-doubt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

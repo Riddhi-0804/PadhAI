@@ -1,5 +1,20 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, UserRole, OnboardingData, SeedCredential, SEED_CREDENTIALS } from '../types/auth';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { User, UserRole, OnboardingData } from '../types/auth';
+import { apiFetch, getStoredToken, TOKEN_STORAGE_KEY } from '../services/api';
+
+const USER_STORAGE_KEY = 'padhai_auth_user';
+
+/** User object returned by the API, normalised for the UI (name never empty). */
+function normalizeUser(raw: any): User {
+  const email = String(raw?.email ?? '').trim();
+  const emailPrefix = email.includes('@') ? email.split('@')[0] : email;
+  return {
+    ...raw,
+    name: String(raw?.name ?? '').trim() || emailPrefix,
+    language: raw?.language === 'hi' ? 'hi' : 'en',
+    onboarding_completed: Boolean(raw?.onboarding_completed),
+  } as User;
+}
 
 interface AuthContextType {
   user: User | null;
@@ -7,9 +22,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   showOnboarding: boolean;
-  login: (email: string, password?: string) => Promise<boolean>;
-  loginWithSeed: (credential: SeedCredential) => void;
-  register: (name: string, email: string, password: string, role: UserRole) => Promise<boolean>;
+  /** Resolves to null on success, or an error code for the sign-in form. */
+  login: (email: string, password: string) => Promise<string | null>;
+  register: (name: string, email: string, password: string, role: UserRole) => Promise<string | null>;
   logout: () => void;
   completeOnboarding: (data: OnboardingData) => Promise<void>;
   hasRole: (roles: UserRole[]) => boolean;
@@ -19,105 +34,86 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Default to Arjun Sharma (Student) on initial load for instant review, while allowing full login/switch
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('padhai_auth_user');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        // fallback
-      }
-    }
-    // Default initial session: Student Arjun Sharma
-    const defaultStudent = SEED_CREDENTIALS[2];
-    return {
-      id: 'usr_student_01',
-      name: defaultStudent.name,
-      email: defaultStudent.email,
-      role: defaultStudent.role,
-      language: defaultStudent.language,
-      level: defaultStudent.level,
-      exam: defaultStudent.exam,
-      subjects: defaultStudent.subjects,
-      onboarding_completed: true,
-    };
-  });
-
-  const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem('padhai_auth_token') || 'seed_session_token_arjun';
-  });
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(() => getStoredToken());
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showOnboarding, setShowOnboarding] = useState<boolean>(false);
 
+  const clearSession = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem(USER_STORAGE_KEY);
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  }, []);
+
+  const applySession = useCallback((nextToken: string, rawUser: unknown) => {
+    const nextUser = normalizeUser(rawUser);
+    if (nextToken) {
+      localStorage.setItem(TOKEN_STORAGE_KEY, nextToken);
+      setToken(nextToken);
+    }
+    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(nextUser));
+    setUser(nextUser);
+  }, []);
+
+  // The token is only trusted after GET /api/auth/me confirms who it belongs to.
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('padhai_auth_user', JSON.stringify(user));
-      // If student hasn't finished onboarding, trigger onboarding modal
-      if (!user.onboarding_completed && user.role === 'student') {
-        setShowOnboarding(true);
+    const storedToken = getStoredToken();
+    if (!storedToken) {
+      clearSession();
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiFetch('/api/auth/me');
+        if (!res.ok) throw new Error('invalid_session');
+        const data = await res.json();
+        if (!cancelled) applySession(storedToken, data.user);
+      } catch {
+        if (!cancelled) clearSession();
+      } finally {
+        if (!cancelled) setIsLoading(false);
       }
-    } else {
-      localStorage.removeItem('padhai_auth_user');
-      localStorage.removeItem('padhai_auth_token');
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [applySession, clearSession]);
+
+  useEffect(() => {
+    // If student hasn't finished onboarding, trigger onboarding modal
+    if (user && !user.onboarding_completed && user.role === 'student') {
+      setShowOnboarding(true);
     }
   }, [user]);
 
-  const loginWithSeed = (credential: SeedCredential) => {
-    const seedUser: User = {
-      id: `usr_${credential.role}_${credential.name.toLowerCase().replace(/[^a-z0-9]/g, '_')}`,
-      name: credential.name,
-      email: credential.email,
-      role: credential.role,
-      language: credential.language,
-      level: credential.level,
-      exam: credential.exam,
-      subjects: credential.subjects,
-      onboarding_completed: true,
-    };
-    setUser(seedUser);
-    const mockToken = `seed_jwt_${credential.role}_${Date.now()}`;
-    setToken(mockToken);
-    localStorage.setItem('padhai_auth_token', mockToken);
-  };
-
-  const login = async (email: string, password: string = 'Password@123'): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<string | null> => {
     setIsLoading(true);
     try {
-      // 1. Try local seed credentials first for instant response
-      const matchedSeed = SEED_CREDENTIALS.find(
-        (s) => s.email.toLowerCase() === email.trim().toLowerCase()
+      const res = await apiFetch(
+        '/api/auth/login',
+        {
+          method: 'POST',
+          body: JSON.stringify({ email: email.trim(), password }),
+        },
+        { skipAuthError: true }
       );
-      if (matchedSeed) {
-        loginWithSeed(matchedSeed);
-        setIsLoading(false);
-        return true;
-      }
-
-      // 2. Fallback to API if user registered dynamically
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
 
       if (res.ok) {
         const data = await res.json();
-        setUser(data.user);
-        setToken(data.token);
-        localStorage.setItem('padhai_auth_token', data.token);
-        setIsLoading(false);
-        return true;
+        applySession(data.token, data.user);
+        return null;
       }
-
-      // If neither matched
-      setIsLoading(false);
-      return false;
+      if (res.status >= 500) return 'server';
+      return 'invalid_credentials';
     } catch {
-      // Offline fallback: create guest session
+      return 'network';
+    } finally {
       setIsLoading(false);
-      return false;
     }
   };
 
@@ -126,58 +122,73 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string,
     password: string,
     role: UserRole
-  ): Promise<boolean> => {
+  ): Promise<string | null> => {
     setIsLoading(true);
     try {
-      const newUser: User = {
-        id: `usr_${Date.now()}`,
-        name,
-        email: email.trim().toLowerCase(),
-        role,
-        language: 'en',
-        level: 'intermediate',
-        exam: 'CBSE 12th',
-        subjects: 'Physics,Chemistry,Mathematics',
-        onboarding_completed: false,
-      };
+      const res = await apiFetch(
+        '/api/auth/register',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            name: name.trim(),
+            email: email.trim(),
+            password,
+            role,
+          }),
+        },
+        { skipAuthError: true }
+      );
 
-      setUser(newUser);
-      const generatedToken = `jwt_${Date.now()}`;
-      setToken(generatedToken);
-      localStorage.setItem('padhai_auth_token', generatedToken);
-
-      if (role === 'student') {
-        setShowOnboarding(true);
+      if (res.ok) {
+        const data = await res.json();
+        applySession(data.token, data.user);
+        return null;
       }
-
-      setIsLoading(false);
-      return true;
+      if (res.status === 409) return 'email_taken';
+      if (res.status === 422) return 'weak_password';
+      if (res.status >= 500) return 'server';
+      return 'register_failed';
     } catch {
+      return 'network';
+    } finally {
       setIsLoading(false);
-      return false;
     }
   };
 
   const completeOnboarding = async (data: OnboardingData): Promise<void> => {
     if (!user) return;
-    const updated: User = {
-      ...user,
+    const payload = {
       language: data.language,
       exam: data.exam,
       subjects: data.subjects.join(', '),
       level: data.level,
-      onboarding_completed: true,
     };
-    setUser(updated);
+
+    try {
+      const res = await apiFetch('/api/auth/onboarding', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const body = await res.json();
+        applySession(token || getStoredToken() || '', body.user);
+        setShowOnboarding(false);
+        return;
+      }
+    } catch {
+      // Offline: keep the desk usable; the next /api/auth/me refresh reconciles it.
+    }
+
+    setUser((prev) =>
+      prev ? normalizeUser({ ...prev, ...payload, onboarding_completed: true }) : prev
+    );
     setShowOnboarding(false);
   };
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('padhai_auth_user');
-    localStorage.removeItem('padhai_auth_token');
-  };
+  const logout = useCallback(() => {
+    clearSession();
+    setShowOnboarding(false);
+  }, [clearSession]);
 
   const hasRole = (roles: UserRole[]): boolean => {
     if (!user) return false;
@@ -193,7 +204,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         showOnboarding,
         login,
-        loginWithSeed,
         register,
         logout,
         completeOnboarding,

@@ -84,6 +84,16 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 Backend health check: [http://localhost:8000/api/health](http://localhost:8000/api/health)
 
+### Run frontend + backend together (local dev)
+```bash
+npm install
+python3 -m pip install -r backend/requirements.txt
+python3 -m backend.db.seed   # first run only: creates the demo personas
+npm run dev:all   # starts FastAPI on :8000 and Vite on :3000
+```
+Vite proxies `/api/*` to `http://localhost:8000` (override with `BACKEND_URL`), so
+login, signup and `/api/auth/me` work from [http://localhost:3000](http://localhost:3000).
+
 ---
 
 ## 3. Environment Variables (`.env`)

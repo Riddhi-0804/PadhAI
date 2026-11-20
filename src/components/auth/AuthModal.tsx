@@ -11,14 +11,16 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccessToast: (msg: string) => void;
+  onAuthenticated?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   onSuccessToast,
+  onAuthenticated,
 }) => {
-  const { login, register, loginWithSeed, isLoading } = useAuth();
+  const { login, register, isLoading } = useAuth();
   const { t } = useLanguage();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [email, setEmail] = useState('');
@@ -26,6 +28,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [name, setName] = useState('');
   const [role, setRole] = useState<UserRole>('student');
   const [error, setError] = useState('');
+  const [showDemo, setShowDemo] = useState(false);
+
+  const describeAuthError = (code: string): string => {
+    switch (code) {
+      case 'invalid_credentials':
+        return t.auth.invalidCreds;
+      case 'email_taken':
+        return 'This email is already registered. Sign in instead.';
+      case 'weak_password':
+        return 'Password is too weak. Use at least 8 characters with a letter and a number.';
+      case 'network':
+        return 'Cannot reach the server. Start the backend on port 8000 and try again.';
+      case 'server':
+        return 'The server could not complete the request. Please try again.';
+      default:
+        return 'Could not create the account. Please check your details and try again.';
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -34,32 +54,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setError('');
 
     if (mode === 'signin') {
-      const ok = await login(email, password);
-      if (ok) {
+      const errorCode = await login(email, password);
+      if (!errorCode) {
         onSuccessToast(t.auth.loginSuccess);
+        onAuthenticated?.();
         onClose();
       } else {
-        setError(t.auth.invalidCreds);
+        setError(describeAuthError(errorCode));
       }
     } else {
       if (!name.trim()) {
         setError('Please enter your full name');
         return;
       }
-      const ok = await register(name, email, password, role);
-      if (ok) {
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters long.');
+        return;
+      }
+      const errorCode = await register(name, email, password, role);
+      if (!errorCode) {
         onSuccessToast(t.auth.registeredSuccess);
+        onAuthenticated?.();
         onClose();
       } else {
-        setError('Failed to create account.');
+        setError(describeAuthError(errorCode));
       }
     }
   };
 
-  const handleSeedSelect = (cred: typeof SEED_CREDENTIALS[0]) => {
-    loginWithSeed(cred);
-    onSuccessToast(`Switched persona to ${cred.name} (${cred.roleLabel})`);
-    onClose();
+  // Demo personas still authenticate through the real API, so they get real tokens.
+  const handleSeedSelect = async (cred: typeof SEED_CREDENTIALS[0]) => {
+    setError('');
+    const errorCode = await login(cred.email, 'Password@123');
+    if (!errorCode) {
+      onSuccessToast(`Signed in as ${cred.name}`);
+      onAuthenticated?.();
+      onClose();
+    } else {
+      setError(describeAuthError(errorCode));
+    }
   };
 
   return (
@@ -193,51 +226,66 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </Button>
         </form>
 
-        {/* Quick Seed Personas Switcher (Required for instant role testing) */}
-        <div className="pt-4 border-t border-[var(--paper-rule)]">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-mono-time uppercase text-[var(--marigold-accent)] font-semibold">
-              {t.auth.quickSwitchSeed}
-            </span>
-            <span className="text-[10px] font-mono-time text-[var(--ink-muted)]">
-              {t.auth.seedNotice}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            {SEED_CREDENTIALS.map((cred) => (
+        {/* Demo personas: development builds only, and still real API logins */}
+        {import.meta.env.DEV && (
+          <div className="pt-4 border-t border-[var(--paper-rule)]">
+            {!showDemo ? (
               <button
-                key={cred.email}
                 type="button"
-                onClick={() => handleSeedSelect(cred)}
-                className="p-2.5 rounded-sm border border-[var(--paper-border)] bg-[var(--paper-elevated)] hover:border-[var(--marigold-accent)] text-left transition-colors cursor-pointer group"
+                onClick={() => setShowDemo(true)}
+                className="text-[11px] font-mono-time uppercase text-[var(--marigold-accent)] font-semibold cursor-pointer"
               >
-                <div className="flex items-center justify-between gap-1 mb-0.5">
-                  <span className="text-xs font-semibold text-[var(--ink-primary)] truncate">
-                    {cred.name}
-                  </span>
-                  <Tag
-                    variant={
-                      cred.role === 'teacher'
-                        ? 'marigold'
-                        : cred.role === 'admin'
-                        ? 'brick'
-                        : cred.role === 'parent'
-                        ? 'ink'
-                        : 'neutral'
-                    }
-                    size="sm"
-                  >
-                    {cred.role}
-                  </Tag>
-                </div>
-                <p className="text-[10px] text-[var(--ink-muted)] truncate">
-                  {cred.roleLabel} • {cred.exam}
-                </p>
+                Try a demo account
               </button>
-            ))}
+            ) : (
+              <>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-mono-time uppercase text-[var(--marigold-accent)] font-semibold">
+                    {t.auth.quickSwitchSeed}
+                  </span>
+                  <span className="text-[10px] font-mono-time text-[var(--ink-muted)]">
+                    {t.auth.seedNotice}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {SEED_CREDENTIALS.map((cred) => (
+                    <button
+                      key={cred.email}
+                      type="button"
+                      disabled={isLoading}
+                      onClick={() => handleSeedSelect(cred)}
+                      className="p-2.5 rounded-sm border border-[var(--paper-border)] bg-[var(--paper-elevated)] hover:border-[var(--marigold-accent)] text-left transition-colors cursor-pointer group disabled:opacity-60"
+                    >
+                      <div className="flex items-center justify-between gap-1 mb-0.5">
+                        <span className="text-xs font-semibold text-[var(--ink-primary)] truncate">
+                          {cred.name}
+                        </span>
+                        <Tag
+                          variant={
+                            cred.role === 'teacher'
+                              ? 'marigold'
+                              : cred.role === 'admin'
+                              ? 'brick'
+                              : cred.role === 'parent'
+                              ? 'ink'
+                              : 'neutral'
+                          }
+                          size="sm"
+                        >
+                          {cred.role}
+                        </Tag>
+                      </div>
+                      <p className="text-[10px] text-[var(--ink-muted)] truncate">
+                        {cred.roleLabel} • {cred.exam}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

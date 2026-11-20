@@ -5,6 +5,7 @@ import {
   TopicStat,
   DifficultyLevel,
 } from '../types/practice';
+import { apiFetch } from './api';
 
 const DEFAULT_TOPIC_STATS: TopicStat[] = [
   {
@@ -82,7 +83,7 @@ class PracticeService {
 
   async getStats(): Promise<{ stats: TopicStat[]; revise_these: TopicStat[]; average_accuracy: number }> {
     try {
-      const res = await fetch('/api/practice/stats');
+      const res = await apiFetch('/api/practice/stats');
       if (res.ok) {
         const data = await res.json();
         this.stats = data.stats;
@@ -112,7 +113,7 @@ class PracticeService {
     topicFilter?: string;
   }): Promise<{ test_id: string; questions: TestQuestion[]; difficulty_assigned: string }> {
     try {
-      const res = await fetch('/api/practice/generate', {
+      const res = await apiFetch('/api/practice/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -243,7 +244,7 @@ class PracticeService {
     questions: TestQuestion[];
   }): Promise<TestResult> {
     try {
-      const res = await fetch('/api/practice/evaluate', {
+      const res = await apiFetch('/api/practice/evaluate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

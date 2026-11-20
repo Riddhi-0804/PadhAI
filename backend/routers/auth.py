@@ -6,6 +6,7 @@ import base64
 import hashlib
 import hmac
 import json
+import re
 import time
 import uuid
 from typing import Dict, Any, Optional
@@ -69,6 +70,16 @@ def authenticate_user(email: str, password: str) -> Optional[Dict[str, Any]]:
     finally:
         conn.close()
 
+def validate_password(password: str) -> Optional[str]:
+    """Returns a human-readable reason when the password is too weak, else None."""
+    if len(password) < 8:
+        return "Password must be at least 8 characters long"
+    if not re.search(r"[A-Za-z]", password):
+        return "Password must include at least one letter"
+    if not re.search(r"\d", password):
+        return "Password must include at least one number"
+    return None
+
 def register_user(
     name: str,
     email: str,
@@ -82,20 +93,30 @@ def register_user(
     conn = get_connection()
     try:
         cursor = conn.cursor()
+        email_clean = email.strip().lower()
+
+        cursor.execute("SELECT id FROM users WHERE email = ?;", (email_clean,))
+        if cursor.fetchone():
+            raise ValueError("email_exists")
+
+        pwd_error = validate_password(password)
+        if pwd_error:
+            raise ValueError(f"weak_password:{pwd_error}")
+
         user_id = f"usr_{uuid.uuid4().hex[:10]}"
         pwd_hash = hash_password(password)
         cursor.execute("""
             INSERT INTO users (id, name, email, password_hash, role, language, level, exam, subjects, onboarding_completed)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0);
         """, (
-            user_id, name.strip(), email.strip().lower(), pwd_hash,
+            user_id, name.strip(), email_clean, pwd_hash,
             role, language, level, exam, subjects
         ))
         conn.commit()
         return {
             "id": user_id,
             "name": name,
-            "email": email.strip().lower(),
+            "email": email_clean,
             "role": role,
             "language": language,
             "level": level,

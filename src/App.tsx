@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LanguageProvider, useLanguage } from './i18n/LanguageContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { setUnauthorizedHandler } from './services/api';
 import { AppRoute, Theme, ToastMessage } from './types';
 import { Navbar } from './components/layout/Navbar';
 import { Sidebar } from './components/layout/Sidebar';
@@ -32,7 +33,22 @@ const PadhAIContent: React.FC = () => {
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
 
-  const { showOnboarding, setShowOnboarding } = useAuth();
+  const { showOnboarding, setShowOnboarding, isAuthenticated, logout } = useAuth();
+
+  // Any 401 from the API clears the session; the effect below returns to sign-in.
+  useEffect(() => {
+    setUnauthorizedHandler(logout);
+    return () => setUnauthorizedHandler(null);
+  }, [logout]);
+
+  const wasAuthenticated = useRef(isAuthenticated);
+  useEffect(() => {
+    if (wasAuthenticated.current && !isAuthenticated) {
+      setCurrentRoute('landing');
+      setIsAuthOpen(true);
+    }
+    wasAuthenticated.current = isAuthenticated;
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -63,7 +79,17 @@ const PadhAIContent: React.FC = () => {
   const renderActiveRoute = () => {
     switch (currentRoute) {
       case 'landing':
-        return <LandingPage onStart={(route) => setCurrentRoute(route)} />;
+        return (
+          <LandingPage
+            onStart={(route) => {
+              if (!isAuthenticated) {
+                setIsAuthOpen(true);
+              } else {
+                setCurrentRoute(route);
+              }
+            }}
+          />
+        );
       case 'dashboard':
         return <DashboardView onNavigate={setCurrentRoute} onTriggerToast={showToast} />;
       case 'notes':
@@ -142,6 +168,7 @@ const PadhAIContent: React.FC = () => {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onSuccessToast={(msg) => showToast(msg, undefined, 'success')}
+        onAuthenticated={() => setCurrentRoute('dashboard')}
       />
 
       {/* Onboarding Wizard Modal */}

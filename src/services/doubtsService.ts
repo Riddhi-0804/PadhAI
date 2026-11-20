@@ -1,4 +1,5 @@
 import { DoubtResponse, AnswerMode, DetectedIntent } from '../types/doubts';
+import { apiFetch } from './api';
 
 class DoubtsService {
   private history: DoubtResponse[] = [];
@@ -24,7 +25,7 @@ class DoubtsService {
     detectedOverride?: DetectedIntent
   ): Promise<DoubtResponse> {
     try {
-      const res = await fetch('/api/doubts/ask', {
+      const res = await apiFetch('/api/doubts/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

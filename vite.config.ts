@@ -82,6 +82,13 @@ export default defineConfig(() => {
       },
     },
     server: {
+      // Forward API calls to the FastAPI backend so /api/* works from the dev server.
+      proxy: {
+        '/api': {
+          target: process.env.BACKEND_URL || 'http://localhost:8000',
+          changeOrigin: true,
+        },
+      },
       // HMR is disabled in AI Studio via DISABLE_HMR env var.
       // Do not modify—file watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',

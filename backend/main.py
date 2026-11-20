@@ -128,6 +128,16 @@ async def register(req: RegisterRequest):
             "role": user["role"]
         })
         return {"token": token, "user": user}
+    except ValueError as e:
+        reason = str(e)
+        if reason == "email_exists":
+            raise HTTPException(
+                status_code=409,
+                detail="An account with this email already exists. Please sign in instead."
+            )
+        if reason.startswith("weak_password:"):
+            raise HTTPException(status_code=422, detail=reason.split(":", 1)[1])
+        raise HTTPException(status_code=400, detail=f"Registration failed: {reason}")
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Registration failed: {str(e)}")
 
