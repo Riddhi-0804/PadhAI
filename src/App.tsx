@@ -33,13 +33,24 @@ const PadhAIContent: React.FC = () => {
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
 
-  const { showOnboarding, setShowOnboarding, isAuthenticated, logout } = useAuth();
+  const { showOnboarding, setShowOnboarding, isAuthenticated, isLoading, logout } = useAuth();
 
   // Any 401 from the API clears the session; the effect below returns to sign-in.
   useEffect(() => {
     setUnauthorizedHandler(logout);
     return () => setUnauthorizedHandler(null);
   }, [logout]);
+
+  // A stored session must survive a refresh: land on the dashboard instead of
+  // falling back to the marketing page while the token is still valid.
+  const restoredRoute = useRef(false);
+  useEffect(() => {
+    if (restoredRoute.current || isLoading) return;
+    restoredRoute.current = true;
+    if (isAuthenticated) {
+      setCurrentRoute((route) => (route === 'landing' ? 'dashboard' : route));
+    }
+  }, [isLoading, isAuthenticated]);
 
   const wasAuthenticated = useRef(isAuthenticated);
   useEffect(() => {
